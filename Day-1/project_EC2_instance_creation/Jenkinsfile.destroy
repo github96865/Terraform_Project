@@ -1,6 +1,10 @@
 pipeline{
     agent any
     
+    options {
+       skipDefaultCheckout true
+    }
+    
     environment{
         
         TERRAFORM_PATH = './Day-1/project_EC2_instance_creation'
