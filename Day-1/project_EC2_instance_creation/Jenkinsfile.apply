@@ -6,66 +6,66 @@ pipeline{
         TERRAFORM_PATH = './Day-1/project_EC2_instance_creation'
         TAG = "B"+"${env.BUILD_NUMBER}"
     }
-    
+
     parameters {
        string defaultValue: 'gopal_1.0.0', description: 'changing the branch!!!', name: 'source', trim: true
      }
 
     stages{
-        stage('checkout from GIT'){
-            steps{
-              cleanWs()
-              git branch: "${params.source}", url: 'https://github.com/github96865/Terraform_Project.git'
-            }
-        }
-        stage('Terraform Init'){
-            steps{
-                script{
-                  sh 'cd $TERRAFORM_PATH && terraform init'
-                }
+        // stage('checkout from GIT'){
+        //     steps{
+        //       cleanWs()
+        //       git branch: "${params.source}", url: 'https://github.com/github96865/Terraform_Project.git'
+        //     }
+        // }
+        // stage('Terraform Init'){
+        //     steps{
+        //         script{
+        //           sh 'cd $TERRAFORM_PATH && terraform init'
+        //         }
                     
-            }
-        }
-        stage('Terraform Plan'){
-          steps{
-              script{
-                sh 'cd $TERRAFORM_PATH && terraform plan -out=tfplan'
-              }
-          }
-        }
-        stage('Terraform Apply'){
-          steps{
-              withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'Aws_credentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
-                  sh 'cd $TERRAFORM_PATH && terraform apply --auto-approve tfplan'
-              }
-          }
-        
-         post{
-             success{
-                 withCredentials([usernamePassword(credentialsId: 'git_hub_user_pwd', passwordVariable: 'GIT_PASS', usernameVariable: 'GIT_USER')]) {
-                     sh '''
-                       git config --global user.name "github96865"
-                       git config --global user.email "pvenugopal994@gmail.com"
-
-                       # Check if there are changes in the state files
-                       git add *.tfstate* || true
-                       git diff-index --quiet HEAD || git commit -m "Updated Terraform state files"
- 
-                       # Push changes to the repository
-                       git push https://${GIT_USER}:${GIT_PASS}@github.com/github96865/Terraform_Project.git $TAG
-                  '''
-                }
-             }
-         }
-        }
-        
-        // stage('Terraform Destroy'){
+        //     }
+        // }
+        // stage('Terraform Plan'){
         //   steps{
-        //       withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'Aws_credentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
-        //           sh 'cd $TERRAFORM_PATH && terraform destroy --auto-approve'
+        //       script{
+        //         sh 'cd $TERRAFORM_PATH && terraform plan -out=tfplan'
         //       }
         //   }
         // }
+        // stage('Terraform Apply'){
+        //   steps{
+        //       withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'Aws_credentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+        //           sh 'cd $TERRAFORM_PATH && terraform apply --auto-approve tfplan'
+        //       }
+        //   }
+        
+        //  post{
+        //      success{
+        //          withCredentials([usernamePassword(credentialsId: 'git_hub_user_pwd', passwordVariable: 'GIT_PASS', usernameVariable: 'GIT_USER')]) {
+        //              sh '''
+        //                git config --global user.name "github96865"
+        //                git config --global user.email "pvenugopal994@gmail.com"
+
+        //                # Check if there are changes in the state files
+        //                git add *.tfstate* || true
+        //                git diff-index --quiet HEAD || git commit -m "Updated Terraform state files"
+ 
+        //                # Push changes to the repository
+        //                git push https://${GIT_USER}:${GIT_PASS}@github.com/github96865/Terraform_Project.git
+        //           '''
+        //         }
+        //      }
+        //  }
+        // }
+        
+        stage('Terraform Destroy'){
+          steps{
+              withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'Aws_credentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                  sh 'cd $TERRAFORM_PATH && terraform destroy --auto-approve'
+              }
+          }
+        }
     }
     
     post {

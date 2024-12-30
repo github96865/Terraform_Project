@@ -47,7 +47,7 @@ pipeline{
                        git diff-index --quiet HEAD || git commit -m "Updated Terraform state files"
  
                        # Push changes to the repository
-                       git push https://${GIT_USER}:${GIT_PASS}@github.com/github96865/Terraform_Project.git $TAG
+                       git push https://${GIT_USER}:${GIT_PASS}@github.com/github96865/Terraform_Project.git
                   '''
                 }
              }
